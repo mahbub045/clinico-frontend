@@ -1,7 +1,5 @@
-import DoctorHome from "@/components/Dashboard/Doctor/Home";
+import DoctorHomeContainer from "@/components/Dashboard/Doctor/Home";
 
-const DoctorDashboard: React.FC = () => {
-  return <DoctorHome />;
-};
-
-export default DoctorDashboard;
+export default function DoctorDashboardPage() {
+  return <DoctorHomeContainer />;
+}
