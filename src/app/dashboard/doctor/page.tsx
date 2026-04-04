@@ -1,9 +1,7 @@
+import DoctorHome from "@/components/Dashboard/Doctor/Home";
+
 const DoctorDashboard: React.FC = () => {
-  return (
-    <div>
-      {/* JSX here */}dfdf
-    </div>
-  );
+  return <DoctorHome />;
 };
 
 export default DoctorDashboard;
