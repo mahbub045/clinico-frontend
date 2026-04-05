@@ -11,13 +11,13 @@ export const BaseApi = createApi({
 
       const token = localStorage.getItem("token");
       if (token) {
-        headers.set("authorization", `Bearer ${token}`);
+        headers.set("authorization", `JWT ${token}`);
       }
 
       return headers;
     },
   }),
-  tagTypes: ["Auth", "User", "Doctor", "Patient", "Appointment"],
+  tagTypes: ["User", "Doctor", "Patient", "Appointment"],
   endpoints: () => ({}),
 });
 

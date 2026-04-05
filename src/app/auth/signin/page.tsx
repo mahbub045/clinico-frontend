@@ -3,20 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLoginMutation } from "@/redux/reducers/Auth/LoginApi";
+import { useLoginMutation } from "@/redux/reducers/Auth/SignInApi";
 import { useLazyGetUserInfoQuery } from "@/redux/reducers/Common/UserInfoApi";
 import {
   ArrowRight,
   Eye,
   EyeOff,
-  Lock,
   Mail,
   ShieldCheck,
   Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 type JwtLoginResponse = {
   access?: string;
@@ -28,6 +27,14 @@ type UserInfoResponse = {
   user_type?: string;
 };
 
+const SignIn: React.FC = () => {
+  return (
+    <Suspense fallback={null}>
+      <SignInContent />
+    </Suspense>
+  );
+};
+
 function getRedirectPathByUserType(userType?: string | null) {
   switch ((userType ?? "").toUpperCase()) {
     case "ADMIN":
@@ -37,7 +44,7 @@ function getRedirectPathByUserType(userType?: string | null) {
     case "DOCTOR":
       return "/dashboard/doctor";
     default:
-      return "/dashboard/doctor";
+      return "/unauthorized";
   }
 }
 
@@ -51,7 +58,7 @@ function setAuthCookie(
   document.cookie = `${name}=${encoded}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
 }
 
-const SignIn: React.FC = () => {
+const SignInContent: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -254,19 +261,7 @@ const SignIn: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="space-y-3 sm:flex sm:items-center sm:justify-between sm:gap-3">
-                  <Button
-                    asChild
-                    variant="secondary"
-                    size="lg"
-                    className="w-full sm:w-auto"
-                    disabled={isSubmitting}
-                  >
-                    <Link href="/auth/signup" className="w-full text-center">
-                      <Lock className="inline size-4" />
-                      Create account
-                    </Link>
-                  </Button>
+                <div className="space-y-3 sm:flex sm:items-center sm:justify-end sm:gap-3">
                   <Button
                     variant="default"
                     type="submit"

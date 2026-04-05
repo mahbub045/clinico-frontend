@@ -1,6 +1,6 @@
-import { BaseApi } from "@/redux/api/BaseApi";
+import { SignInApi } from "@/redux/api/SignInApi";
 
-export const LoginApi = BaseApi.injectEndpoints({
+export const SignInApis = SignInApi.injectEndpoints({
   endpoints: (build) => ({
     login: build.mutation({
       query: (credentials) => ({
@@ -13,4 +13,4 @@ export const LoginApi = BaseApi.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation } = LoginApi;
+export const { useLoginMutation } = SignInApis;
