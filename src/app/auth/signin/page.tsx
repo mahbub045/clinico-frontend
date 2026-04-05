@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
-  Lock,
   Mail,
   ShieldCheck,
   Users,
@@ -254,19 +253,7 @@ const SignIn: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="space-y-3 sm:flex sm:items-center sm:justify-between sm:gap-3">
-                  <Button
-                    asChild
-                    variant="secondary"
-                    size="lg"
-                    className="w-full sm:w-auto"
-                    disabled={isSubmitting}
-                  >
-                    <Link href="/auth/signup" className="w-full text-center">
-                      <Lock className="inline size-4" />
-                      Create account
-                    </Link>
-                  </Button>
+                <div className="space-y-3 sm:flex sm:items-center sm:justify-end sm:gap-3">
                   <Button
                     variant="default"
                     type="submit"
