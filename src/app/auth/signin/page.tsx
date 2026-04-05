@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 type JwtLoginResponse = {
   access?: string;
@@ -25,6 +25,14 @@ type JwtLoginResponse = {
 
 type UserInfoResponse = {
   user_type?: string;
+};
+
+const SignIn: React.FC = () => {
+  return (
+    <Suspense fallback={null}>
+      <SignInContent />
+    </Suspense>
+  );
 };
 
 function getRedirectPathByUserType(userType?: string | null) {
@@ -50,7 +58,7 @@ function setAuthCookie(
   document.cookie = `${name}=${encoded}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
 }
 
-const SignIn: React.FC = () => {
+const SignInContent: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
