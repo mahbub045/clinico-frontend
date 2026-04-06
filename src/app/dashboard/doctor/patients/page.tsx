@@ -1,7 +1,5 @@
 import PatientsContainer from "@/components/Dashboard/Doctor/Patients";
-import { requireDashboardRole } from "@/lib/dashboard-auth";
 
 export default async function PatientsPage() {
-  await requireDashboardRole(["DOCTOR"]);
   return <PatientsContainer />;
 }
