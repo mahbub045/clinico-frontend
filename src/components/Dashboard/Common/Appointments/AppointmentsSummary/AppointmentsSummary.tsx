@@ -48,7 +48,7 @@ const AppointmentsSummary: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid w-full place-items-center gap-3 sm:max-w-md">
+          <div className="grid w-full place-items-end gap-3 sm:max-w-md">
             <Stethoscope className="text-primary/70 h-24 w-24" />
           </div>
         </div>
