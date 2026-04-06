@@ -96,23 +96,8 @@ const AppointmentList: React.FC = () => {
   return (
     <div className="space-y-8">
       <Card className="rounded-md p-6 shadow-sm">
-        <div className="grid w-full grid-cols-[1fr_auto] gap-3">
-          <div className="relative w-sm">
-            <SearchIcon className="text-primary pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              id="appointment-search"
-              placeholder="Search appointments"
-              className="w-full pl-10"
-            />
-          </div>
-          <Button variant="secondary">
-            <Plus className="size-4" />
-            New appointment
-          </Button>
-        </div>
-
         <section className="space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-foreground text-sm font-semibold">
                 Upcoming Appointments
@@ -121,7 +106,18 @@ const AppointmentList: React.FC = () => {
                 A quick view of today’s schedule and patient status.
               </p>
             </div>
-            <Badge variant="secondary">6 appointments</Badge>
+            <div className="relative w-full max-w-sm">
+              <SearchIcon className="text-primary pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                id="appointment-search"
+                placeholder="Search appointments"
+                className="w-full pl-10"
+              />
+            </div>
+            <Button variant="secondary" className="justify-self-end">
+              <Plus className="size-4" />
+              New appointment
+            </Button>
           </div>
 
           <Table className="border-border bg-card w-full border text-sm shadow-sm">
