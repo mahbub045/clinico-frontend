@@ -1,8 +1,15 @@
 "use client";
 
-import { Home, LogOutIcon, StethoscopeIcon, Users } from "lucide-react";
+import {
+  Home,
+  LogOutIcon,
+  StethoscopeIcon,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,20 +27,72 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-const navItems = [
-  { href: "/dashboard/doctor", label: "Home", icon: Home },
-  {
-    href: "/dashboard/doctor/appointments",
-    label: "Appointments",
-    icon: StethoscopeIcon,
-  },
-  { href: "/dashboard/doctor/patients", label: "Patients", icon: Users },
-] as const;
+const navItemsByRole: Record<
+  string,
+  ReadonlyArray<{ href: string; label: string; icon: LucideIcon }>
+> = {
+  ADMIN: [{ href: "/dashboard/admin", label: "Home", icon: Home }],
+  RECEPTIONIST: [
+    { href: "/dashboard/receptionist", label: "Home", icon: Users },
+    {
+      href: "/dashboard/receptionist/patients",
+      label: "Patients",
+      icon: Users,
+    },
+    {
+      href: "/dashboard/receptionist/appointments",
+      label: "Appointments",
+      icon: StethoscopeIcon,
+    },
+  ],
+  DOCTOR: [
+    { href: "/dashboard/doctor", label: "Home", icon: Home },
+    { href: "/dashboard/doctor/patients", label: "Patients", icon: Users },
+    {
+      href: "/dashboard/doctor/appointments",
+      label: "Appointments",
+      icon: StethoscopeIcon,
+    },
+  ],
+};
+
+function getStoredUserType() {
+  if (typeof window === "undefined") return null;
+
+  const localUserType = localStorage.getItem("user_type");
+  if (localUserType) return localUserType.toUpperCase();
+
+  const match = document.cookie.match(/(?:^|;\s*)user_type=([^;]+)/);
+  return match ? decodeURIComponent(match[1]).toUpperCase() : null;
+}
 
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const normalizedPathname = pathname?.replace(/\/$/, "") ?? "";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setMounted(true);
+    });
+  }, []);
+
+  const userType = useMemo(() => {
+    if (!mounted) return null;
+    const _pathname = pathname;
+    return getStoredUserType();
+  }, [mounted, pathname]);
+
+  const navItems = useMemo(
+    () => (userType ? (navItemsByRole[userType] ?? []) : []),
+    [userType],
+  );
+
+  const homeHref = useMemo(
+    () => navItems[0]?.href ?? "/auth/signin",
+    [navItems],
+  );
 
   function clearCookie(name: string) {
     if (typeof document === "undefined") return;
@@ -66,10 +125,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <div className="flex h-[31] items-center px-2 text-sm font-semibold">
-          <Link
-            href="/dashboard/doctor"
-            className="text-primary truncate text-3xl"
-          >
+          <Link href={homeHref} className="text-primary truncate text-3xl">
             ClinicO
           </Link>
         </div>
