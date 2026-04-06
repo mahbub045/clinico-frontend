@@ -1,6 +1,13 @@
 "use client";
 
-import { Edit, LoaderPinwheel, SearchIcon, Trash, User } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  LoaderPinwheel,
+  SearchIcon,
+  Trash,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -147,7 +154,12 @@ const PatientList: React.FC = () => {
                         <User className="size-4" />
                       </span>
                       <div className="space-y-0.5">
-                        <div>{patient.name}</div>
+                        <Link
+                          href={`/dashboard/${dashboardRole}/patients/${patient.alias}`}
+                          className="text-primary hover:underline"
+                        >
+                          {patient.name}
+                        </Link>
                       </div>
                     </div>
                   </TableCell>
@@ -160,11 +172,11 @@ const PatientList: React.FC = () => {
                   <TableCell>{patient.last_visit}</TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex items-center justify-end gap-2">
-                      <Button asChild variant="secondary" size="sm">
+                      <Button asChild variant="default" size="sm">
                         <Link
                           href={`/dashboard/${dashboardRole}/patients/${patient.alias}`}
                         >
-                          View
+                          <Eye />
                         </Link>
                       </Button>
                       <Button variant="secondary" size="sm">

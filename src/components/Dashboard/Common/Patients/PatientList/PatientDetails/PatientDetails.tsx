@@ -1,12 +1,15 @@
 "use client";
 import { useGetPatientDetailsQuery } from "@/redux/reducers/Common/Patients/PatientsApi";
+import { LoaderPinwheel } from "lucide-react";
 import { useParams } from "next/navigation";
 import { formatChoiceFieldValue } from "../../../../../../../utils/formatters";
 
 const PatientDetails: React.FC = () => {
-  const alias = useParams();
-  console.log("A::", alias);
-  const { data: patient, isLoading } = useGetPatientDetailsQuery({ alias });
+  const { alias } = useParams() as { alias?: string };
+  const { data: patient, isLoading } = useGetPatientDetailsQuery(
+    { alias: alias ?? "" },
+    { skip: !alias },
+  );
 
   return (
     <div className="space-y-8">
@@ -21,7 +24,14 @@ const PatientDetails: React.FC = () => {
         </div>
       </div>
 
-      {!patient ? (
+      {isLoading ? (
+        <div className="border-border bg-card rounded-xl border p-6 text-center">
+          <div className="mx-auto flex max-w-xs flex-col items-center justify-center gap-3">
+            <LoaderPinwheel className="text-primary animate-spin" />
+            <p className="text-foreground">Loading patient details...</p>
+          </div>
+        </div>
+      ) : !patient ? (
         <div className="border-border bg-card text-destructive rounded-xl border p-6 text-center">
           Unable to load patient details.
         </div>

@@ -1,4 +1,4 @@
-import PatientDetailsContainer from "@/components/Dashboard/Receptionist/Patients/[Alias]";
+import PatientDetailsContainer from "@/components/Dashboard/Doctor/Patients/[Alias]";
 import { requireDashboardRole } from "@/lib/dashboard-auth";
 
 export default async function PatientsPage() {
