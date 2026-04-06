@@ -4,7 +4,7 @@ export const PatientsApi = BaseApi.injectEndpoints({
   endpoints: (build) => ({
     getPatients: build.query({
       query: (params) => ({
-        url: "/api/patient/",
+        url: "/api/patients/",
         method: "GET",
         params,
       }),
@@ -12,7 +12,7 @@ export const PatientsApi = BaseApi.injectEndpoints({
     }),
     addPatient: build.mutation({
       query: (data) => ({
-        url: "/api/patient/",
+        url: "/api/patients/",
         method: "POST",
         body: data,
       }),
@@ -20,7 +20,7 @@ export const PatientsApi = BaseApi.injectEndpoints({
     }),
     editPatient: build.mutation({
       query: ({ alias, ...data }) => ({
-        url: `/api/patient/${alias}/`,
+        url: `/api/patients/${alias}/`,
         method: "PATCH",
         body: data,
       }),
@@ -28,7 +28,7 @@ export const PatientsApi = BaseApi.injectEndpoints({
     }),
     deletePatient: build.mutation({
       query: (alias) => ({
-        url: `/api/patient/${alias}/`,
+        url: `/api/patients/${alias}/`,
         method: "DELETE",
       }),
       invalidatesTags: ["Patients"],

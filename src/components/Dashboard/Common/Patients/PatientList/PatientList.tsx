@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetPatientsQuery } from "@/redux/reducers/Common/Patients/PatientsApi";
-import { PatientRow, RawPatient } from "@/types/Common/Patients/PatientsType";
+import { RawPatient } from "@/types/Common/Patients/PatientsType";
 import { formatChoiceFieldValue } from "../../../../../../utils/formatters";
 import AddPatientDialog from "./Dialogs/AddPatientDialog";
 
@@ -33,24 +33,23 @@ const formatAge = (dateOfBirth?: string | null) => {
   return `${age}`;
 };
 
-const normalizePatient = (patient: RawPatient): PatientRow => {
+const normalizePatient = (
+  patient: RawPatient,
+): RawPatient & { name: string; age: string; last_visit: string } => {
   const name = [
-    formatChoiceFieldValue(patient.user_title),
-    patient.user_first_name,
-    patient.user_last_name,
+    formatChoiceFieldValue(patient.title),
+    patient.first_name,
+    patient.last_name,
   ]
     .filter(Boolean)
     .join(" ")
     .trim();
 
   return {
-    patient_alias: patient.patient_alias,
+    ...patient,
     name: name || "Unknown patient",
     age: formatAge(patient.date_of_birth),
-    gender: patient.gender || "Unknown",
-    lastVisit: patient.last_visit || "-",
-    email: patient.user_email || "-",
-    phone: patient.user_phone || "-",
+    last_visit: patient.last_visit || "-",
   };
 };
 
@@ -125,7 +124,7 @@ const PatientList: React.FC = () => {
               </TableRow>
             ) : (
               filteredPatients.map((patient, index) => (
-                <TableRow key={patient.patient_alias ?? patient.email ?? index}>
+                <TableRow key={patient.alias ?? patient.email ?? index}>
                   <TableCell className="text-foreground font-medium">
                     <div className="flex items-center gap-3">
                       <span className="bg-primary/10 text-primary inline-flex h-9 w-9 items-center justify-center rounded-2xl">
@@ -142,7 +141,7 @@ const PatientList: React.FC = () => {
                   </TableCell>
                   <TableCell>{patient.email}</TableCell>
                   <TableCell>{patient.phone}</TableCell>
-                  <TableCell>{patient.lastVisit}</TableCell>
+                  <TableCell>{patient.last_visit}</TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex items-center justify-end gap-2">
                       <Button variant="secondary" size="sm">
