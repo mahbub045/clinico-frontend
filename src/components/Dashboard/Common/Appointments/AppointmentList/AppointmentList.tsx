@@ -98,6 +98,9 @@ const AppointmentList: React.FC = () => {
       <section className="space-y-4">
         <div className="border-border bg-card flex flex-col gap-4 rounded-3xl border p-6 shadow-sm sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">
+            <p className="text-primary text-sm font-semibold tracking-[0.24em] uppercase">
+              Appointment Management
+            </p>
             <h1 className="text-foreground text-3xl font-semibold tracking-tight">
               Appointments
             </h1>

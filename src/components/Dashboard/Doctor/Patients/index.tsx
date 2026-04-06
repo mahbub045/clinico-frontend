@@ -1,4 +1,5 @@
 import Breadcrumbs from "../../Common/Breadcrumbs/Breadcrumbs";
+import Patients from "../../Common/Patients/Patients";
 
 const PatientsContainer: React.FC = () => {
   return (
@@ -9,6 +10,7 @@ const PatientsContainer: React.FC = () => {
           { label: "Patients", href: "/dashboard/doctor/patients" },
         ]}
       />
+      <Patients />
     </div>
   );
 };
