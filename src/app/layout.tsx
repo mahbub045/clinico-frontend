@@ -1,3 +1,4 @@
+import ToastProvider from "@/components/ui/ToastProvider";
 import { ReduxProvider } from "@/redux/ReduxProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -29,7 +30,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning className="flex min-h-full flex-col">
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          {children}
+          <ToastProvider />
+        </ReduxProvider>
       </body>
     </html>
   );

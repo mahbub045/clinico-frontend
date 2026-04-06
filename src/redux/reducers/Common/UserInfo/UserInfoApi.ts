@@ -3,8 +3,11 @@ import { BaseApi } from "@/redux/api/BaseApi";
 export const UserInfoApi = BaseApi.injectEndpoints({
   endpoints: (build) => ({
     getUserInfo: build.query({
-      query: () => "/auth/users/me",
-      providesTags: ["User"],
+      query: (params) => ({
+        url: "/auth/users/me",
+        method: "GET",
+        params,
+      }),
     }),
   }),
 });

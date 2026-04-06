@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLoginMutation } from "@/redux/reducers/Auth/SignInApi";
-import { useLazyGetUserInfoQuery } from "@/redux/reducers/Common/UserInfoApi";
+import { useLazyGetUserInfoQuery } from "@/redux/reducers/Common/UserInfo/UserInfoApi";
 import {
   ArrowRight,
   Eye,

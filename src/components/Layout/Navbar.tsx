@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useGetUserInfoQuery } from "@/redux/reducers/Common/UserInfoApi";
+import { useGetUserInfoQuery } from "@/redux/reducers/Common/UserInfo/UserInfoApi";
 
 export function Navbar() {
   const { data: userInfo } = useGetUserInfoQuery(undefined);
