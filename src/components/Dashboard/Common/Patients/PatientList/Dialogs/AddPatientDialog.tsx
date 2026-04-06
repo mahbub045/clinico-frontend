@@ -23,6 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useAddPatientMutation } from "@/redux/reducers/Common/Patients/PatientsApi";
 import { Plus } from "lucide-react";
+import { toast } from "react-toastify";
 
 type AddPatientPayload = {
   email: string;
@@ -124,10 +125,12 @@ const AddPatientDialog: React.FC = () => {
       }
 
       await addPatient(body).unwrap();
+      toast.success("Patient added successfully.");
       setFormData(initialFormState);
       setOpen(false);
     } catch (error) {
       console.error("Failed to add patient", error);
+      toast.error("Failed to add patient. Please try again.");
     }
   };
 
