@@ -34,6 +34,7 @@ import { useGetPatientsQuery } from "@/redux/reducers/Common/Patients/PatientsAp
 import { RawPatient } from "@/types/Common/Patients/PatientsType";
 import { formatChoiceFieldValue } from "../../../../../../utils/formatters";
 import AddPatientDialog from "./Dialogs/AddPatientDialog";
+import DeletePatientDialog from "./Dialogs/DeletePatientDialog";
 
 const formatAge = (dateOfBirth?: string | null) => {
   if (!dateOfBirth) return "-";
@@ -163,13 +164,51 @@ const PatientList: React.FC = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{patient.age}</TableCell>
                   <TableCell>
-                    {formatChoiceFieldValue(patient.gender)}
+                    {patient.age !== "-" ? (
+                      patient.age
+                    ) : (
+                      <small className="text-muted-foreground">
+                        Not provided
+                      </small>
+                    )}
                   </TableCell>
-                  <TableCell>{patient.email}</TableCell>
-                  <TableCell>{patient.phone}</TableCell>
-                  <TableCell>{patient.last_visit}</TableCell>
+                  <TableCell>
+                    {formatChoiceFieldValue(patient.gender || "") ? (
+                      formatChoiceFieldValue(patient.gender || "")
+                    ) : (
+                      <small className="text-muted-foreground">
+                        Not specified
+                      </small>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {patient.email ? (
+                      patient.email
+                    ) : (
+                      <small className="text-muted-foreground">
+                        Not provided
+                      </small>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {patient.phone ? (
+                      patient.phone
+                    ) : (
+                      <small className="text-muted-foreground">
+                        Not provided
+                      </small>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {patient.last_visit !== "-" ? (
+                      patient.last_visit
+                    ) : (
+                      <small className="text-muted-foreground">
+                        Not provided
+                      </small>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex items-center justify-end gap-2">
                       <Button asChild variant="default" size="sm">
@@ -182,9 +221,14 @@ const PatientList: React.FC = () => {
                       <Button variant="secondary" size="sm">
                         <Edit />
                       </Button>
-                      <Button variant="danger" size="sm">
-                        <Trash />
-                      </Button>
+                      <DeletePatientDialog
+                        alias={patient.alias ?? ""}
+                        patientName={patient.name || "Not provided"}
+                      >
+                        <Button variant="danger" size="sm">
+                          <Trash />
+                        </Button>
+                      </DeletePatientDialog>
                     </div>
                   </TableCell>
                 </TableRow>
