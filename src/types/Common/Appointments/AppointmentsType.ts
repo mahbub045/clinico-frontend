@@ -28,3 +28,20 @@ export type Appointment = {
   created_at?: string | null;
   updated_at?: string | null;
 };
+
+export type OptionRecord = {
+  id: number;
+  full_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+};
+
+export interface AddAppointmentPayload {
+  patient_id: string;
+  doctor_id: string;
+  appointment_date: string;
+  appointment_time: string;
+  status: string;
+  reason: string;
+  notes: string;
+}

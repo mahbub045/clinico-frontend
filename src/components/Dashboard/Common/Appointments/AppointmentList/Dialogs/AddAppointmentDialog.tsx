@@ -27,23 +27,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCreateAppointmentMutation } from "@/redux/reducers/Common/Appointments/AppointmentsApi";
 import { useGetDoctorsQuery } from "@/redux/reducers/Common/Doctors/DoctorsApi";
 import { useGetPatientsQuery } from "@/redux/reducers/Common/Patients/PatientsApi";
-
-type OptionRecord = {
-  id: number;
-  full_name?: string | null;
-  first_name?: string | null;
-  last_name?: string | null;
-};
-
-interface AddAppointmentPayload {
-  patient_id: string;
-  doctor_id: string;
-  appointment_date: string;
-  appointment_time: string;
-  status: string;
-  reason: string;
-  notes: string;
-}
+import {
+  AddAppointmentPayload,
+  OptionRecord,
+} from "@/types/Common/Appointments/AppointmentsType";
 
 const initialFormState: AddAppointmentPayload = {
   patient_id: "",
