@@ -23,6 +23,7 @@ import { useGetAppointmentsQuery } from "@/redux/reducers/Common/Appointments/Ap
 import { Appointment } from "@/types/Common/Appointments/AppointmentsType";
 import { Edit, LoaderPinwheel, Plus, SearchIcon, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 import { formatChoiceFieldValue } from "../../../../../../utils/formatters";
 import DeleteAppointmentDialog from "./Dialogs/DeleteAppointmentDialog";
@@ -69,6 +70,9 @@ const AppointmentList: React.FC = () => {
     () => Array.from({ length: totalPages }, (_, index) => index + 1),
     [totalPages],
   );
+
+  const pathname = usePathname();
+  const dashboardRole = pathname?.split("/")[2] || "";
 
   return (
     <div className="space-y-8">
@@ -142,8 +146,8 @@ const AppointmentList: React.FC = () => {
                   <TableRow key={appointment.id}>
                     <TableCell className="text-foreground font-medium">
                       <Link
-                        href={`/dashboard/receptionist/appointments/${appointment.alias}`}
-                        className="hover:underline text-primary"
+                        href={`/dashboard/${dashboardRole}/appointments/${appointment.alias}`}
+                        className="text-primary hover:underline"
                       >
                         {appointment.patient?.full_name ?? "Unknown patient"}
                       </Link>
