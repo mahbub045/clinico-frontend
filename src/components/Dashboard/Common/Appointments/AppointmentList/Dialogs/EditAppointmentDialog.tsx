@@ -6,6 +6,14 @@ import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -64,10 +72,52 @@ const EditAppointmentDialog: React.FC<EditAppointmentDialogProps> = ({
   );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  const { data: doctors, isLoading: doctorsLoading } =
-    useGetDoctorsQuery(undefined);
-  const { data: patients, isLoading: patientsLoading } =
-    useGetPatientsQuery(undefined);
+  const [comboboxPortalContainer, setComboboxPortalContainer] =
+    useState<HTMLDivElement | null>(null);
+
+  const [patientQuery, setPatientQuery] = useState("");
+  const [doctorQuery, setDoctorQuery] = useState("");
+  const [debouncedPatientQuery, setDebouncedPatientQuery] = useState("");
+  const [debouncedDoctorQuery, setDebouncedDoctorQuery] = useState("");
+
+  const [selectedPatient, setSelectedPatient] = useState<OptionRecord | null>(
+    null,
+  );
+  const [selectedDoctor, setSelectedDoctor] = useState<OptionRecord | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setDebouncedPatientQuery(patientQuery.trim());
+    }, 300);
+    return () => window.clearTimeout(handle);
+  }, [patientQuery]);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setDebouncedDoctorQuery(doctorQuery.trim());
+    }, 300);
+    return () => window.clearTimeout(handle);
+  }, [doctorQuery]);
+
+  const patientSearchParams = debouncedPatientQuery.length
+    ? { search: debouncedPatientQuery }
+    : undefined;
+  const doctorSearchParams = debouncedDoctorQuery.length
+    ? { search: debouncedDoctorQuery }
+    : undefined;
+
+  const {
+    data: doctors,
+    isLoading: doctorsLoading,
+    isFetching: doctorsFetching,
+  } = useGetDoctorsQuery(doctorSearchParams, { skip: !open });
+  const {
+    data: patients,
+    isLoading: patientsLoading,
+    isFetching: patientsFetching,
+  } = useGetPatientsQuery(patientSearchParams, { skip: !open });
   const [editAppointment, { isLoading: editingAppointment }] =
     useUpdateAppointmentMutation();
 
@@ -83,14 +133,63 @@ const EditAppointmentDialog: React.FC<EditAppointmentDialogProps> = ({
       ? ((doctors as { results?: OptionRecord[] }).results ?? [])
       : [];
 
-  useEffect(() => {
+  const getOptionLabel = (option: OptionRecord, fallbackPrefix: string) =>
+    option.full_name ||
+    `${option.first_name ?? ""} ${option.last_name ?? ""}`.trim() ||
+    `${fallbackPrefix} #${option.id}`;
+
+  const patientsItems: OptionRecord[] = selectedPatient
+    ? patientsList.some((p) => p.id === selectedPatient.id)
+      ? patientsList
+      : [selectedPatient, ...patientsList]
+    : patientsList;
+
+  const doctorsItems: OptionRecord[] = selectedDoctor
+    ? doctorsList.some((d) => d.id === selectedDoctor.id)
+      ? doctorsList
+      : [selectedDoctor, ...doctorsList]
+    : doctorsList;
+
+  const syncFromInitialValues = () => {
     setFormData(buildFormState(initialValues));
-  }, [initialValues]);
+
+    const initialPatientId = initialValues.patient_id
+      ? Number(initialValues.patient_id)
+      : NaN;
+    const initialDoctorId = initialValues.doctor_id
+      ? Number(initialValues.doctor_id)
+      : NaN;
+
+    const nextSelectedPatient = Number.isFinite(initialPatientId)
+      ? ({
+          id: initialPatientId,
+          full_name: initialValues.patient_label ?? null,
+        } as OptionRecord)
+      : null;
+    const nextSelectedDoctor = Number.isFinite(initialDoctorId)
+      ? ({
+          id: initialDoctorId,
+          full_name: initialValues.doctor_label ?? null,
+        } as OptionRecord)
+      : null;
+
+    setSelectedPatient(nextSelectedPatient);
+    setSelectedDoctor(nextSelectedDoctor);
+    setPatientQuery(
+      nextSelectedPatient ? getOptionLabel(nextSelectedPatient, "Patient") : "",
+    );
+    setDoctorQuery(
+      nextSelectedDoctor ? getOptionLabel(nextSelectedDoctor, "Doctor") : "",
+    );
+  };
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
-      setFormData(buildFormState(initialValues));
       setFieldErrors({});
+      syncFromInitialValues();
+    } else {
+      setFieldErrors({});
+      syncFromInitialValues();
     }
     setOpen(nextOpen);
   };
@@ -201,6 +300,8 @@ const EditAppointmentDialog: React.FC<EditAppointmentDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
+        <div ref={setComboboxPortalContainer} />
+
         <form onSubmit={handleSubmit} className="grid gap-4 py-2">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
@@ -210,31 +311,82 @@ const EditAppointmentDialog: React.FC<EditAppointmentDialogProps> = ({
               >
                 Patient
               </label>
-              <Select
-                value={formData.patient_id}
-                onValueChange={(value) =>
-                  handleSelectChange("patient_id", value)
-                }
+              <Combobox
+                items={patientsItems}
+                value={selectedPatient}
+                onValueChange={(patient) => {
+                  setSelectedPatient(patient);
+                  setPatientQuery(
+                    patient ? getOptionLabel(patient, "Patient") : "",
+                  );
+                  handleSelectChange(
+                    "patient_id",
+                    patient ? String(patient.id) : "",
+                  );
+                }}
+                inputValue={patientQuery}
+                onInputValueChange={(next) => setPatientQuery(next)}
+                isItemEqualToValue={(item, value) => item.id === value.id}
+                itemToStringLabel={(item) => getOptionLabel(item, "Patient")}
+                itemToStringValue={(item) => String(item.id)}
+                disabled={patientsLoading}
               >
-                <SelectTrigger id="patient_id" className="w-full">
-                  <SelectValue
-                    placeholder={
-                      patientsLoading
-                        ? "Loading patients..."
-                        : (initialValues.patient_label ?? "Select patient")
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {patientsList.map((patient) => (
-                    <SelectItem key={patient.id} value={String(patient.id)}>
-                      {patient.full_name ||
-                        `${patient.first_name ?? ""} ${patient.last_name ?? ""}`.trim() ||
-                        `Patient #${patient.id}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <ComboboxInput
+                  className="w-full"
+                  id="patient_id"
+                  placeholder={
+                    patientsLoading
+                      ? "Loading patients..."
+                      : "Search by name, email or phone..."
+                  }
+                  showClear
+                />
+                <ComboboxContent portalContainer={comboboxPortalContainer}>
+                  <ComboboxEmpty>
+                    {patientsLoading || patientsFetching
+                      ? "Searching..."
+                      : "No patients found."}
+                  </ComboboxEmpty>
+                  <ComboboxList>
+                    {(patient: OptionRecord) => (
+                      <ComboboxItem key={patient.id} value={patient}>
+                        <span className="flex min-w-0 flex-col">
+                          <span className="truncate">
+                            {getOptionLabel(patient, "Patient")}
+                          </span>
+                          {(
+                            patient as unknown as {
+                              email?: string | null;
+                              phone?: string | null;
+                            }
+                          ).email ||
+                          (
+                            patient as unknown as {
+                              email?: string | null;
+                              phone?: string | null;
+                            }
+                          ).phone ? (
+                            <span className="text-muted-foreground truncate text-xs">
+                              {(
+                                patient as unknown as {
+                                  email?: string | null;
+                                  phone?: string | null;
+                                }
+                              ).email ??
+                                (
+                                  patient as unknown as {
+                                    email?: string | null;
+                                    phone?: string | null;
+                                  }
+                                ).phone}
+                            </span>
+                          ) : null}
+                        </span>
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
               {renderFieldError("patient_id")}
             </div>
 
@@ -245,31 +397,68 @@ const EditAppointmentDialog: React.FC<EditAppointmentDialogProps> = ({
               >
                 Doctor
               </label>
-              <Select
-                value={formData.doctor_id}
-                onValueChange={(value) =>
-                  handleSelectChange("doctor_id", value)
-                }
+              <Combobox
+                items={doctorsItems}
+                value={selectedDoctor}
+                onValueChange={(doctor) => {
+                  setSelectedDoctor(doctor);
+                  setDoctorQuery(
+                    doctor ? getOptionLabel(doctor, "Doctor") : "",
+                  );
+                  handleSelectChange(
+                    "doctor_id",
+                    doctor ? String(doctor.id) : "",
+                  );
+                }}
+                inputValue={doctorQuery}
+                onInputValueChange={(next) => setDoctorQuery(next)}
+                isItemEqualToValue={(item, value) => item.id === value.id}
+                itemToStringLabel={(item) => getOptionLabel(item, "Doctor")}
+                itemToStringValue={(item) => String(item.id)}
+                disabled={doctorsLoading}
               >
-                <SelectTrigger id="doctor_id" className="w-full">
-                  <SelectValue
-                    placeholder={
-                      doctorsLoading
-                        ? "Loading doctors..."
-                        : (initialValues.doctor_label ?? "Select doctor")
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {doctorsList.map((doctor) => (
-                    <SelectItem key={doctor.id} value={String(doctor.id)}>
-                      {doctor.full_name ||
-                        `${doctor.first_name ?? ""} ${doctor.last_name ?? ""}`.trim() ||
-                        `Doctor #${doctor.id}`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <ComboboxInput
+                  className="w-full"
+                  id="doctor_id"
+                  placeholder={
+                    doctorsLoading ? "Loading doctors..." : "Search doctor..."
+                  }
+                  showClear
+                />
+                <ComboboxContent portalContainer={comboboxPortalContainer}>
+                  <ComboboxEmpty>
+                    {doctorsLoading || doctorsFetching
+                      ? "Searching..."
+                      : "No doctors found."}
+                  </ComboboxEmpty>
+                  <ComboboxList>
+                    {(doctor: OptionRecord) => (
+                      <ComboboxItem key={doctor.id} value={doctor}>
+                        <span className="flex min-w-0 flex-col">
+                          <span className="truncate">
+                            {getOptionLabel(doctor, "Doctor")}
+                          </span>
+                          {(
+                            doctor as unknown as {
+                              specialization?: string | null;
+                            }
+                          ).specialization ? (
+                            <span className="text-muted-foreground truncate text-xs">
+                              {
+                                (
+                                  doctor as unknown as {
+                                    specialization?: string | null;
+                                  }
+                                ).specialization
+                              }
+                            </span>
+                          ) : null}
+                        </span>
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
               {renderFieldError("doctor_id")}
             </div>
           </div>
