@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 
 type JwtLoginResponse = {
   access?: string;
@@ -137,9 +138,13 @@ const SignInContent: React.FC = () => {
         setAuthCookie("user_type", userType);
       }
 
+      toast.success("Signed in successfully. Redirecting...");
       router.push(nextParam || getRedirectPathByUserType(userType));
     } catch (err) {
       // RTK Query provides `error` but it's not always the latest in this scope.
+      toast.error(
+        "Sign in failed. Please check your credentials and try again.",
+      );
       console.error("Sign in failed", err);
     }
   }
@@ -274,12 +279,12 @@ const SignInContent: React.FC = () => {
                   </Button>
                 </div>
 
-                {(formError || error) && (
+                {/* {(formError || error) && (
                   <p className="text-destructive text-sm leading-6">
                     {formError ??
                       "Sign in failed. Please check your credentials."}
                   </p>
-                )}
+                )} */}
 
                 <p className="text-muted-foreground text-center text-sm leading-6">
                   By signing in, you agree to Clinico’s terms and privacy
