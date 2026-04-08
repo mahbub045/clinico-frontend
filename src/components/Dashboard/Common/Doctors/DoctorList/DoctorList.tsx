@@ -22,6 +22,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetDoctorsQuery } from "@/redux/reducers/Common/Doctors/DoctorsApi";
+import { useGetUserInfoQuery } from "@/redux/reducers/Common/UserInfo/UserInfoApi";
+import AddDioctorDialog from "./Dialogs/AddDioctorDialog";
+import DeleteDioctorDialog from "./Dialogs/DeleteDioctorDialog";
+import EditDioctorDialog from "./Dialogs/EditDioctorDialog";
 
 type RawDoctor = {
   alias?: string;
@@ -98,6 +102,8 @@ const DoctorList: React.FC = () => {
   const pathname = usePathname();
   const dashboardRole = pathname?.split("/")[2] || "";
 
+  const { data: userInfo } = useGetUserInfoQuery(undefined);
+
   return (
     <div className="card bg-card border-border/70 space-y-8 rounded-3xl border p-6 shadow-sm">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -128,9 +134,7 @@ const DoctorList: React.FC = () => {
               className="w-full pl-10"
             />
           </div>
-          <Button className="w-full" variant="secondary">
-            Add doctor
-          </Button>
+          {userInfo?.user_type === "ADMIN" && <AddDioctorDialog />}
         </div>
       </div>
 
@@ -204,14 +208,19 @@ const DoctorList: React.FC = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="inline-flex items-center justify-end gap-2">
-                    <Button asChild size="sm" variant="outline">
+                    <Button asChild size="sm" variant="default">
                       <Link
                         href={`/dashboard/${dashboardRole}/doctors/${doctor.alias ?? ""}`}
                       >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
+                        <Eye />
                       </Link>
                     </Button>
+                    {userInfo?.user_type === "ADMIN" && (
+                      <>
+                        <EditDioctorDialog />
+                        <DeleteDioctorDialog />
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
