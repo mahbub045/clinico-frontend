@@ -1,9 +1,12 @@
 import Breadcrumbs from "../../Common/Breadcrumbs/Breadcrumbs";
 import MedicalRecordAnalyticsCondition from "./components/MedicalRecordAnalyticsCondition";
+import MedicalRecordAnalyticsGenderDistribution from "./components/MedicalRecordAnalyticsGenderDistribution";
 import MedicalRecordAnalyticsMonthlyCost from "./components/MedicalRecordAnalyticsMonthlyCost";
 import MedicalRecordAnalyticsMonthlyRecord from "./components/MedicalRecordAnalyticsMonthlyRecord";
 import MedicalRecordAnalyticsOutcome from "./components/MedicalRecordAnalyticsOutcome";
 import MedicalRecordAnalyticsProcedure from "./components/MedicalRecordAnalyticsProcedure";
+import MedicalRecordAnalyticsReadmission from "./components/MedicalRecordAnalyticsReadmission";
+import MedicalRecordAnalyticsSatisfaction from "./components/MedicalRecordAnalyticsSatisfaction";
 import MedicalRecordSummary from "./components/MedicalRecordSummary";
 
 const AdminHomeContainer: React.FC = () => {
@@ -23,6 +26,13 @@ const AdminHomeContainer: React.FC = () => {
         <div className="grid gap-6 xl:grid-cols-2">
           <MedicalRecordAnalyticsMonthlyCost />
           <MedicalRecordAnalyticsMonthlyRecord />
+        </div>
+        <div className="grid gap-6 xl:grid-cols-2">
+          <MedicalRecordAnalyticsSatisfaction />
+          <MedicalRecordAnalyticsReadmission />
+        </div>
+        <div className="grid gap-6 xl:grid-cols-2">
+          <MedicalRecordAnalyticsGenderDistribution />
         </div>
       </div>
     </>

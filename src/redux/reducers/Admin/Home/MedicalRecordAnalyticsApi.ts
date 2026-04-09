@@ -37,6 +37,27 @@ export const MedicalRecordAnalyticsApi = BaseApi.injectEndpoints({
       }),
       providesTags: ["MedicalRecordSummary"],
     }),
+    getMedicalRecordAnalyticsMonthlySatisfaction: builder.query({
+      query: () => ({
+        url: "/api/core/medical-records/analytics/satisfaction-distribution/",
+        method: "GET",
+      }),
+      providesTags: ["MedicalRecordSummary"],
+    }),
+    getMedicalRecordAnalyticsMonthlyReadmission: builder.query({
+      query: () => ({
+        url: "/api/core/medical-records/analytics/readmission-distribution/",
+        method: "GET",
+      }),
+      providesTags: ["MedicalRecordSummary"],
+    }),
+    getMedicalRecordAnalyticsGenderDistribution: builder.query({
+      query: () => ({
+        url: "/api/core/medical-records/analytics/gender-distribution/",
+        method: "GET",
+      }),
+      providesTags: ["MedicalRecordSummary"],
+    }),
   }),
 });
 
@@ -46,4 +67,7 @@ export const {
   useGetMedicalRecordAnalyticsOutcomeQuery,
   useGetMedicalRecordAnalyticsMonthlyCostQuery,
   useGetMedicalRecordAnalyticsMonthlyRecordQuery,
+  useGetMedicalRecordAnalyticsMonthlySatisfactionQuery,
+  useGetMedicalRecordAnalyticsMonthlyReadmissionQuery,
+  useGetMedicalRecordAnalyticsGenderDistributionQuery,
 } = MedicalRecordAnalyticsApi;

@@ -40,6 +40,21 @@ export type MonthlyRecordAnalyticsPoint = {
   total_records: number;
 };
 
+export type MonthlySatisfactionAnalyticsPoint = {
+  satisfaction: number;
+  total_records: number;
+};
+
+export type MonthlyGenderDistributionAnalyticsPoint = {
+  gender: string;
+  total_records: number;
+};
+
+export type MonthlyReadmissionAnalyticsPoint = {
+  readmission: string;
+  total_records: number;
+};
+
 export type ProcedureAnalyticsPoint = {
   procedure: string;
   total_records: number;
