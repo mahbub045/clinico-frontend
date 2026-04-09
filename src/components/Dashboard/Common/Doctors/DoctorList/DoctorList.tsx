@@ -1,18 +1,20 @@
 "use client";
 
-import {
-  Eye,
-  LoaderPinwheel,
-  SearchIcon,
-  ShieldCheck,
-  User,
-} from "lucide-react";
+import { Eye, LoaderPinwheel, SearchIcon, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -23,32 +25,15 @@ import {
 } from "@/components/ui/table";
 import { useGetDoctorsQuery } from "@/redux/reducers/Common/Doctors/DoctorsApi";
 import { useGetUserInfoQuery } from "@/redux/reducers/Common/UserInfo/UserInfoApi";
+import {
+  DoctorRow,
+  DoctorsResponse,
+  RawDoctor,
+} from "@/types/Common/Doctors/DoctorsType";
+import { formatChoiceFieldValue } from "../../../../../../utils/formatters";
 import AddDioctorDialog from "./Dialogs/AddDioctorDialog";
 import DeleteDioctorDialog from "./Dialogs/DeleteDioctorDialog";
 import EditDioctorDialog from "./Dialogs/EditDioctorDialog";
-
-type RawDoctor = {
-  alias?: string;
-  name?: string;
-  title?: string;
-  first_name?: string;
-  last_name?: string;
-  specialty?: string;
-  department?: string;
-  email?: string;
-  phone?: string;
-  is_active?: boolean;
-  is_available?: boolean;
-  [key: string]: unknown;
-};
-
-type DoctorsResponse = RawDoctor[] | { results?: RawDoctor[] } | RawDoctor;
-
-type DoctorRow = RawDoctor & {
-  name: string;
-  specialty: string;
-  status: string;
-};
 
 const formatDoctorName = (record: RawDoctor) => {
   const firstName = record.first_name || "";
@@ -92,11 +77,25 @@ const DoctorList: React.FC = () => {
       rawDoctors.map((doctor) => ({
         ...doctor,
         name: formatDoctorName(doctor),
-        specialty: doctor.specialty || doctor.department || "General",
-        status:
-          doctor.is_active || doctor.is_available ? "Available" : "Offline",
+        specialty:
+          doctor.specialization ||
+          doctor.specialty ||
+          doctor.department ||
+          "General Medicine",
+
+        degree: doctor.degree || "N/A",
+        experience: doctor.experience_years?.toString() || "-",
       })),
     [rawDoctors],
+  );
+
+  const totalPages = doctorsData?.total_pages ?? 1;
+  const currentPage = doctorsData?.current_page ?? page;
+  const totalItems = doctorsData?.total_items ?? normalizedDoctors.length;
+
+  const paginationPages = useMemo(
+    () => Array.from({ length: totalPages }, (_, index) => index + 1),
+    [totalPages],
   );
 
   const pathname = usePathname();
@@ -143,26 +142,26 @@ const DoctorList: React.FC = () => {
           <TableRow>
             <TableHead className="text-primary">Name</TableHead>
             <TableHead className="text-primary">Specialty</TableHead>
+            <TableHead className="text-primary">Degree</TableHead>
+            <TableHead className="text-primary">Experience</TableHead>
             <TableHead className="text-primary">Email</TableHead>
             <TableHead className="text-primary">Phone</TableHead>
-            <TableHead className="text-primary">Status</TableHead>
             <TableHead className="text-primary text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className="py-10 text-center">
+              <TableCell colSpan={8} className="py-10 text-center">
                 <div className="text-muted-foreground flex items-center justify-center gap-2">
                   <LoaderPinwheel className="text-primary animate-spin" />
-                  Loading doctors...
                 </div>
               </TableCell>
             </TableRow>
           ) : normalizedDoctors.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={6}
+                colSpan={8}
                 className="text-muted-foreground py-10 text-center"
               >
                 No doctors found. Try a different search term.
@@ -181,15 +180,17 @@ const DoctorList: React.FC = () => {
                         href={`/dashboard/${dashboardRole}/doctors/${doctor.alias ?? ""}`}
                         className="text-primary hover:underline"
                       >
+                        {formatChoiceFieldValue(doctor.title) + " "}
                         {doctor.name}
                       </Link>
-                      <p className="text-muted-foreground text-xs">
-                        {doctor.title || "Doctor"}
-                      </p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>{doctor.specialty}</TableCell>
+                <TableCell>{doctor.degree}</TableCell>
+                <TableCell>
+                  {doctor.experience !== "-" ? `${doctor.experience} yrs` : "-"}
+                </TableCell>
                 <TableCell>
                   {doctor.email || (
                     <span className="text-muted-foreground">Not provided</span>
@@ -200,12 +201,7 @@ const DoctorList: React.FC = () => {
                     <span className="text-muted-foreground">Not provided</span>
                   )}
                 </TableCell>
-                <TableCell>
-                  <span className="border-border/70 text-foreground inline-flex items-center gap-2 rounded-full border bg-white/95 px-3 py-1 text-xs font-medium shadow-sm shadow-slate-950/5 dark:bg-slate-950/90 dark:text-slate-200">
-                    <ShieldCheck className="text-primary h-3.5 w-3.5" />
-                    {doctor.status}
-                  </span>
-                </TableCell>
+
                 <TableCell className="text-right">
                   <div className="inline-flex items-center justify-end gap-2">
                     <Button asChild size="sm" variant="default">
@@ -217,8 +213,14 @@ const DoctorList: React.FC = () => {
                     </Button>
                     {userInfo?.user_type === "ADMIN" && (
                       <>
-                        <EditDioctorDialog />
-                        <DeleteDioctorDialog />
+                        <EditDioctorDialog
+                          alias={doctor.alias ?? ""}
+                          initialValues={doctor}
+                        />
+                        <DeleteDioctorDialog
+                          alias={doctor.alias ?? ""}
+                          doctorName={doctor.name}
+                        />
                       </>
                     )}
                   </div>
@@ -228,6 +230,53 @@ const DoctorList: React.FC = () => {
           )}
         </TableBody>
       </Table>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-muted-foreground text-sm">
+          Total Doctors: {totalItems}.
+        </p>
+        {totalPages > 1 && (
+          <Pagination className="w-full sm:w-auto">
+            <PaginationPrevious
+              href="#"
+              className={
+                currentPage <= 1 ? "pointer-events-none opacity-50" : undefined
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                if (currentPage > 1) setPage(currentPage - 1);
+              }}
+            />
+            <PaginationContent>
+              {paginationPages.map((pageNumber) => (
+                <PaginationItem key={pageNumber}>
+                  <PaginationLink
+                    href="#"
+                    isActive={pageNumber === currentPage}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setPage(pageNumber);
+                    }}
+                  >
+                    {pageNumber}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+            </PaginationContent>
+            <PaginationNext
+              href="#"
+              className={
+                currentPage >= totalPages
+                  ? "pointer-events-none opacity-50"
+                  : undefined
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                if (currentPage < totalPages) setPage(currentPage + 1);
+              }}
+            />
+          </Pagination>
+        )}
+      </div>
     </div>
   );
 };
