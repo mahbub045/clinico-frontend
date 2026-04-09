@@ -29,6 +29,14 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+type LengthStayApiResponsePoint = Omit<
+  LengthStayAnalyticsPoint,
+  "age_group"
+> & {
+  length_of_stay_group?: string;
+  age_group?: string;
+};
+
 const getExtreme = (
   data: LengthStayAnalyticsPoint[],
   key: keyof LengthStayAnalyticsPoint,
@@ -43,7 +51,14 @@ const getExtreme = (
 const MedicalRecordAnalyticsLengthStay: React.FC = () => {
   const { data, isLoading, isError } =
     useGetMedicalRecordAnalyticsLengthStayQuery(undefined);
-  const chartData: LengthStayAnalyticsPoint[] = data ?? [];
+
+  const chartData: LengthStayAnalyticsPoint[] = (
+    (data ?? []) as LengthStayApiResponsePoint[]
+  ).map((item) => ({
+    ...item,
+    age_group: item.age_group ?? item.length_of_stay_group ?? "",
+  }));
+
   const hasData = chartData.length > 0;
   const largestGroup = hasData
     ? getExtreme(chartData, "total_records", (a, b) => a > b)

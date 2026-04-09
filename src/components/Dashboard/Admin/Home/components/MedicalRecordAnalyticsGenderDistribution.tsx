@@ -16,12 +16,9 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#2563eb", "#f97316", "#10b981"];
 
-const formatRecordCount = (value: number) =>
-  value.toLocaleString("en-US");
+const formatRecordCount = (value: number) => value.toLocaleString("en-US");
 
-const getLargestGroup = (
-  data: MonthlyGenderDistributionAnalyticsPoint[],
-) =>
+const getLargestGroup = (data: MonthlyGenderDistributionAnalyticsPoint[]) =>
   data.reduce(
     (best, current) =>
       current.total_records > best.total_records ? current : best,
@@ -33,10 +30,14 @@ const MedicalRecordAnalyticsGenderDistribution: React.FC = () => {
     useGetMedicalRecordAnalyticsGenderDistributionQuery(undefined);
   const chartData: MonthlyGenderDistributionAnalyticsPoint[] = data ?? [];
   const hasData = chartData.length > 0;
-  const totalRecords = chartData.reduce((sum, item) => sum + item.total_records, 0);
+  const totalRecords = chartData.reduce(
+    (sum, item) => sum + item.total_records,
+    0,
+  );
   const largestGroup = hasData ? getLargestGroup(chartData) : null;
   const femaleRecords =
-    chartData.find((item) => item.gender.toLowerCase() === "female")?.total_records ?? 0;
+    chartData.find((item) => item.gender.toLowerCase() === "female")
+      ?.total_records ?? 0;
   const femaleShare = hasData
     ? ((femaleRecords / totalRecords) * 100).toFixed(0)
     : "0";
@@ -52,7 +53,8 @@ const MedicalRecordAnalyticsGenderDistribution: React.FC = () => {
             Gender distribution
           </h2>
           <p className="text-muted-foreground mt-3 max-w-2xl text-sm leading-6">
-            See how gender splits across medical records for your current dataset.
+            See how gender splits across medical records for your current
+            dataset.
           </p>
         </div>
       </div>
@@ -158,8 +160,11 @@ const MedicalRecordAnalyticsGenderDistribution: React.FC = () => {
                         innerRadius={60}
                         outerRadius={100}
                         paddingAngle={4}
+                        labelLine={false}
                         label={({ name, percent }) =>
-                          `${name} ${(percent ?? 0) * 100}%`
+                          name === "FEMALE"
+                            ? null
+                            : `${name} ${(percent ?? 0) * 100}%`
                         }
                       >
                         {chartData.map((entry, index) => (
@@ -184,7 +189,8 @@ const MedicalRecordAnalyticsGenderDistribution: React.FC = () => {
         </div>
       ) : (
         <div className="border-border/70 bg-muted/80 text-muted-foreground rounded-[1.75rem] border p-6 text-sm dark:border-slate-800 dark:bg-slate-950/80">
-          No gender analytics data available. Please check your filters or try again later.
+          No gender analytics data available. Please check your filters or try
+          again later.
         </div>
       )}
     </section>
