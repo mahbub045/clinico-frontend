@@ -11,8 +11,10 @@ const ReceptionistsContainer: React.FC = () => {
           { label: "Receptionists", href: "/dashboard/admin/receptionists" },
         ]}
       />
-      <ReceptionistOverview />
-      <ReceptionistList />
+      <div className="space-y-6">
+        <ReceptionistOverview />
+        <ReceptionistList />
+      </div>
     </div>
   );
 };

@@ -1,3 +1,5 @@
+import ReceptionistsDetails from "@/components/Dashboard/Admin/Receptionists/[Alias]";
+
 export default function ReceptionistDetailsPage() {
-  return <div>page</div>;
+  return <ReceptionistsDetails />;
 }

@@ -1,19 +1,19 @@
 "use client";
 
-import {
-  Edit,
-  Eye,
-  Plus,
-  SearchIcon,
-  ShieldCheck,
-  Trash,
-  User,
-} from "lucide-react";
+import { Eye, SearchIcon, User } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -22,45 +22,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-type ReceptionistRecord = {
-  alias: string;
-  name: string;
-  email: string;
-  phone: string;
-  branch: string;
-  status: "Online" | "Offline" | "Pending";
-};
-
-const receptionists: ReceptionistRecord[] = [
-  {
-    alias: "jane-doe",
-    name: "Jane Doe",
-    email: "jane.doe@clinico.com",
-    phone: "+1 (555) 123-9876",
-    branch: "Main Clinic",
-    status: "Online",
-  },
-  {
-    alias: "michael-ross",
-    name: "Michael Ross",
-    email: "michael.ross@clinico.com",
-    phone: "+1 (555) 214-7890",
-    branch: "Uptown Desk",
-    status: "Offline",
-  },
-  {
-    alias: "eyni-sanchez",
-    name: "Eyni Sanchez",
-    email: "eyni.sanchez@clinico.com",
-    phone: "+1 (555) 654-3210",
-    branch: "East Wing",
-    status: "Pending",
-  },
-];
+import { useGetReceptionistsQuery } from "@/redux/reducers/Admin/Receptionists/ReceptionistsApi";
+import {
+  ReceptionistApiItem,
+  ReceptionistRecord,
+} from "@/types/Admin/Receptionists/ReceptionistsType";
+import { formatChoiceFieldValue } from "../../../../../../utils/formatters";
+import AddReceptionistDialog from "./Dialogs/AddReceptionistDialog";
+import DeleteReceptionistDialog from "./Dialogs/DeleteReceptionistDialog";
+import EditReceptionistDialog from "./Dialogs/EditReceptionistDialog";
 
 const ReceptionistList: React.FC = () => {
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+
+  const { data: receptionistsResponse, isLoading } = useGetReceptionistsQuery({
+    search: query,
+    page,
+  });
+
+  const receptionists: ReceptionistRecord[] = useMemo(() => {
+    const results = (receptionistsResponse?.results ??
+      []) as ReceptionistApiItem[];
+    return results.map((item) => ({
+      alias: item.alias,
+      title: item.title,
+      name: `${item.first_name} ${item.last_name}`,
+      email: item.email,
+      phone: item.phone,
+      branch: item.suburb,
+    }));
+  }, [receptionistsResponse]);
+
+  const currentPage = receptionistsResponse?.current_page ?? page;
+  const totalPages = receptionistsResponse?.total_pages ?? 1;
+  const totalItems = receptionistsResponse?.total_items ?? receptionists.length;
+
+  const paginationPages = Array.from(
+    { length: totalPages },
+    (_, index) => index + 1,
+  );
+
+  const getRawReceptionist = (alias: string): ReceptionistApiItem | undefined =>
+    (receptionistsResponse?.results ?? []).find(
+      (item: ReceptionistApiItem) => item.alias === alias,
+    );
 
   const filteredReceptionists = useMemo(
     () =>
@@ -70,7 +76,7 @@ const ReceptionistList: React.FC = () => {
           .toLowerCase()
           .includes(query.toLowerCase()),
       ),
-    [query],
+    [query, receptionists],
   );
 
   return (
@@ -95,15 +101,15 @@ const ReceptionistList: React.FC = () => {
             <Input
               id="receptionist-search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setPage(1);
+              }}
               placeholder="Search receptionists..."
               className="w-full pl-10"
             />
           </div>
-          <Button size="sm" className="w-full sm:w-auto">
-            <Plus />
-            Add receptionist
-          </Button>
+          <AddReceptionistDialog />
         </div>
       </div>
 
@@ -114,12 +120,20 @@ const ReceptionistList: React.FC = () => {
             <TableHead className="text-primary">Email</TableHead>
             <TableHead className="text-primary">Phone</TableHead>
             <TableHead className="text-primary">Branch</TableHead>
-            <TableHead className="text-primary">Status</TableHead>
             <TableHead className="text-primary text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredReceptionists.length === 0 ? (
+          {isLoading ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="text-muted-foreground py-10 text-center"
+              >
+                Loading receptionists...
+              </TableCell>
+            </TableRow>
+          ) : filteredReceptionists.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={6}
@@ -141,6 +155,7 @@ const ReceptionistList: React.FC = () => {
                         href={`/dashboard/admin/receptionists/${receptionist.alias}`}
                         className="text-primary hover:underline"
                       >
+                        {formatChoiceFieldValue(receptionist.title) + " "}
                         {receptionist.name}
                       </Link>
                     </div>
@@ -149,12 +164,7 @@ const ReceptionistList: React.FC = () => {
                 <TableCell>{receptionist.email}</TableCell>
                 <TableCell>{receptionist.phone}</TableCell>
                 <TableCell>{receptionist.branch}</TableCell>
-                <TableCell>
-                  <span className="border-border/70 text-foreground inline-flex items-center gap-2 rounded-full border bg-white/95 px-3 py-1 text-xs font-medium shadow-sm shadow-slate-950/5 dark:bg-slate-950/90 dark:text-slate-200">
-                    <ShieldCheck className="text-primary h-3.5 w-3.5" />
-                    {receptionist.status}
-                  </span>
-                </TableCell>
+
                 <TableCell className="text-right">
                   <div className="inline-flex items-center justify-end gap-2">
                     <Button asChild size="sm" variant="default">
@@ -164,12 +174,16 @@ const ReceptionistList: React.FC = () => {
                         <Eye />
                       </Link>
                     </Button>
-                    <Button size="sm" variant="secondary">
-                      <Edit />
-                    </Button>
-                    <Button size="sm" variant="danger">
-                      <Trash />
-                    </Button>
+                    {getRawReceptionist(receptionist.alias) ? (
+                      <EditReceptionistDialog
+                        alias={receptionist.alias}
+                        initialValues={getRawReceptionist(receptionist.alias)!}
+                      />
+                    ) : null}
+                    <DeleteReceptionistDialog
+                      alias={receptionist.alias}
+                      receptionistName={receptionist.name}
+                    />
                   </div>
                 </TableCell>
               </TableRow>
@@ -177,6 +191,53 @@ const ReceptionistList: React.FC = () => {
           )}
         </TableBody>
       </Table>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-muted-foreground text-sm">
+          Total Receptionists: {totalItems}.
+        </p>
+        {totalPages > 1 && (
+          <Pagination className="w-full sm:w-auto">
+            <PaginationPrevious
+              href="#"
+              className={
+                currentPage <= 1 ? "pointer-events-none opacity-50" : undefined
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                if (currentPage > 1) setPage(currentPage - 1);
+              }}
+            />
+            <PaginationContent>
+              {paginationPages.map((pageNumber) => (
+                <PaginationItem key={pageNumber}>
+                  <PaginationLink
+                    href="#"
+                    isActive={pageNumber === currentPage}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setPage(pageNumber);
+                    }}
+                  >
+                    {pageNumber}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+            </PaginationContent>
+            <PaginationNext
+              href="#"
+              className={
+                currentPage >= totalPages
+                  ? "pointer-events-none opacity-50"
+                  : undefined
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                if (currentPage < totalPages) setPage(currentPage + 1);
+              }}
+            />
+          </Pagination>
+        )}
+      </div>
     </div>
   );
 };
