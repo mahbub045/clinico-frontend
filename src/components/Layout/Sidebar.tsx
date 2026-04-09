@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Banknote,
   BriefcaseMedical,
   Files,
   Home,
@@ -55,6 +56,11 @@ const navItemsByRole: Record<
       label: "Medical Records",
       icon: Files,
     },
+    {
+      href: "/dashboard/admin/bills",
+      label: "Bill Management",
+      icon: Banknote,
+    },
   ],
 
   RECEPTIONIST: [
@@ -83,6 +89,11 @@ const navItemsByRole: Record<
       href: "/dashboard/receptionist/medical-records",
       label: "Medical Records",
       icon: Files,
+    },
+    {
+      href: "/dashboard/receptionist/bills",
+      label: "Bill Management",
+      icon: Banknote,
     },
   ],
 
