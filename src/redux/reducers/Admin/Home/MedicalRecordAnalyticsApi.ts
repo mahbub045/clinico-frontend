@@ -58,6 +58,20 @@ export const MedicalRecordAnalyticsApi = BaseApi.injectEndpoints({
       }),
       providesTags: ["MedicalRecordSummary"],
     }),
+    getMedicalRecordAnalyticsAgeGroup: builder.query({
+      query: () => ({
+        url: "/api/core/medical-records/analytics/age-groups/",
+        method: "GET",
+      }),
+      providesTags: ["MedicalRecordSummary"],
+    }),
+    getMedicalRecordAnalyticsLengthStay: builder.query({
+      query: () => ({
+        url: "/api/core/medical-records/analytics/length-of-stay-groups/",
+        method: "GET",
+      }),
+      providesTags: ["MedicalRecordSummary"],
+    }),
   }),
 });
 
@@ -70,4 +84,6 @@ export const {
   useGetMedicalRecordAnalyticsMonthlySatisfactionQuery,
   useGetMedicalRecordAnalyticsMonthlyReadmissionQuery,
   useGetMedicalRecordAnalyticsGenderDistributionQuery,
+  useGetMedicalRecordAnalyticsAgeGroupQuery,
+  useGetMedicalRecordAnalyticsLengthStayQuery,
 } = MedicalRecordAnalyticsApi;
