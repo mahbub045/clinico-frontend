@@ -2,6 +2,7 @@
 
 import {
   BriefcaseMedical,
+  Files,
   Home,
   StethoscopeIcon,
   Users,
@@ -43,6 +44,11 @@ const navItemsByRole: Record<
       label: "Receptionists",
       icon: Users,
     },
+    {
+      href: "/dashboard/admin/medical-records",
+      label: "Medical Records",
+      icon: Files,
+    },
   ],
   RECEPTIONIST: [
     { href: "/dashboard/receptionist", label: "Home", icon: Home },
@@ -61,6 +67,11 @@ const navItemsByRole: Record<
       label: "Appointments",
       icon: BriefcaseMedical,
     },
+    {
+      href: "/dashboard/receptionist/medical-records",
+      label: "Medical Records",
+      icon: Files,
+    },
   ],
   DOCTOR: [
     { href: "/dashboard/doctor", label: "Home", icon: Home },
@@ -74,6 +85,11 @@ const navItemsByRole: Record<
       href: "/dashboard/doctor/appointments",
       label: "Appointments",
       icon: BriefcaseMedical,
+    },
+    {
+      href: "/dashboard/doctor/medical-records",
+      label: "Medical Records",
+      icon: Files,
     },
   ],
 };
