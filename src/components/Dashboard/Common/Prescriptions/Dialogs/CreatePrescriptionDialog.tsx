@@ -25,8 +25,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useCommonAppointmentListQuery } from "@/redux/reducers/Common/CommonApis/CommonApis";
-import { useCreatePrescriptionMutation } from "@/redux/reducers/Common/Prescriptions/PrescriptionsApi";
+import {
+  useCreatePrescriptionMutation,
+  useGetMyAppointmentsQuery,
+} from "@/redux/reducers/Common/Prescriptions/PrescriptionsApi";
 import { Appointment } from "@/types/Common/Appointments/AppointmentsType";
 import { CreatePrescriptionPayload } from "@/types/Common/Prescriptions/PrescriptionsType";
 
@@ -57,7 +59,7 @@ const CreatePrescriptionDialog: React.FC = () => {
     data: appointmentsData,
     isLoading: appointmentsLoading,
     isFetching: appointmentsFetching,
-  } = useCommonAppointmentListQuery(
+  } = useGetMyAppointmentsQuery(
     debouncedAppointmentQuery.length ? debouncedAppointmentQuery : undefined,
     { skip: !open },
   );

@@ -46,6 +46,20 @@ export const PrescriptionsApi = BaseApi.injectEndpoints({
       }),
       invalidatesTags: ["Prescriptions"],
     }),
+    getPrescriptionOverview: build.query({
+      query: () => ({
+        url: "/api/prescriptions/dashboard/",
+        method: "GET",
+      }),
+      providesTags: ["Prescriptions"],
+    }),
+    getMyAppointments: build.query({
+      query: (search) => ({
+        url: "/api/appointments/my-appointments/",
+        method: "GET",
+        params: { search },
+      }),
+    }),
   }),
 });
 
@@ -56,4 +70,6 @@ export const {
   useCreatePrescriptionMutation,
   useEditPrescriptionMutation,
   useDeletePrescriptionMutation,
+  useGetPrescriptionOverviewQuery,
+  useGetMyAppointmentsQuery,
 } = PrescriptionsApi;
