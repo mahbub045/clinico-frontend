@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, LoaderPinwheel, SearchIcon } from "lucide-react";
+import { Edit, Eye, LoaderPinwheel, SearchIcon, Trash } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -26,12 +26,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetBillsQuery } from "@/redux/reducers/Common/Bills/BillsApi";
+import { useGetUserInfoQuery } from "@/redux/reducers/Common/UserInfo/UserInfoApi";
 import { BillItem } from "@/types/Common/Bills/BillsType";
 import {
   formatChoiceFieldValue,
   formatDate,
   getCurrencySign,
 } from "../../../../../../utils/formatters";
+import DeleteBillDialog from "./Dialogs/DeleteBillDialog";
+import EditBillDialog from "./Dialogs/EditBillDialog";
+import MakeBillDialog from "./Dialogs/MakeBillDialog";
 
 const getPaginationRange = (currentPage: number, totalPages: number) => {
   if (totalPages <= 9) {
@@ -100,6 +104,9 @@ const BillList: React.FC = () => {
   const pathname = usePathname();
   const dashboardRole = pathname?.split("/")[2] || "";
 
+  const { data: userInfo } = useGetUserInfoQuery(undefined);
+  const isReceptionist = userInfo?.user_type === "RECEPTIONIST";
+
   return (
     <div className="space-y-8">
       <Card className="rounded-md p-6 shadow-sm">
@@ -117,18 +124,22 @@ const BillList: React.FC = () => {
             </p>
           </div>
 
-          <div className="relative w-full max-w-sm">
-            <SearchIcon className="text-primary pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              id="bill-search"
-              className="w-full pl-10"
-              placeholder="Search bills by number, patient, doctor..."
-              value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(1);
-              }}
-            />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="relative w-full max-w-sm">
+              <SearchIcon className="text-primary pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                id="bill-search"
+                className="w-full pl-10"
+                placeholder="Search bills.."
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
+
+            {isReceptionist && <MakeBillDialog />}
           </div>
         </div>
 
@@ -217,13 +228,33 @@ const BillList: React.FC = () => {
                       </TableCell>
                       <TableCell>{createdAt}</TableCell>
                       <TableCell className="text-right">
-                        <Button asChild variant="default" size="sm">
-                          <Link
-                            href={`/dashboard/${dashboardRole}/bills/${bill.alias}`}
-                          >
-                            <Eye />
-                          </Link>
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button asChild variant="default" size="sm">
+                            <Link
+                              href={`/dashboard/${dashboardRole}/bills/${bill.alias}`}
+                            >
+                              <Eye />
+                            </Link>
+                          </Button>
+
+                          {isReceptionist && (
+                            <>
+                              <EditBillDialog alias={bill.alias}>
+                                <Button variant="secondary" size="sm">
+                                  <Edit />
+                                </Button>
+                              </EditBillDialog>
+                              <DeleteBillDialog
+                                alias={bill.alias}
+                                billLabel={bill.bill_number || bill.slug}
+                              >
+                                <Button variant="danger" size="sm">
+                                  <Trash />
+                                </Button>
+                              </DeleteBillDialog>
+                            </>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
