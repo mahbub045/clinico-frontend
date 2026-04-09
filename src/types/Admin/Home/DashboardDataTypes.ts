@@ -34,6 +34,12 @@ export type MonthlyCostAnalyticsPoint = {
   average_cost: number;
 };
 
+export type MonthlyRecordAnalyticsPoint = {
+  year: number;
+  month: number;
+  total_records: number;
+};
+
 export type ProcedureAnalyticsPoint = {
   procedure: string;
   total_records: number;

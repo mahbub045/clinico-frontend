@@ -30,6 +30,13 @@ export const MedicalRecordAnalyticsApi = BaseApi.injectEndpoints({
       }),
       providesTags: ["MedicalRecordSummary"],
     }),
+    getMedicalRecordAnalyticsMonthlyRecord: builder.query({
+      query: () => ({
+        url: "/api/core/medical-records/analytics/monthly-record-trend/",
+        method: "GET",
+      }),
+      providesTags: ["MedicalRecordSummary"],
+    }),
   }),
 });
 
@@ -38,4 +45,5 @@ export const {
   useGetMedicalRecordAnalyticsProcedureQuery,
   useGetMedicalRecordAnalyticsOutcomeQuery,
   useGetMedicalRecordAnalyticsMonthlyCostQuery,
+  useGetMedicalRecordAnalyticsMonthlyRecordQuery,
 } = MedicalRecordAnalyticsApi;
