@@ -4,6 +4,7 @@ import {
   BriefcaseMedical,
   Files,
   Home,
+  NotebookPen,
   StethoscopeIcon,
   Users,
   type LucideIcon,
@@ -45,11 +46,17 @@ const navItemsByRole: Record<
       icon: Users,
     },
     {
+      href: "/dashboard/admin/prescriptions",
+      label: "Prescriptions",
+      icon: NotebookPen,
+    },
+    {
       href: "/dashboard/admin/medical-records",
       label: "Medical Records",
       icon: Files,
     },
   ],
+
   RECEPTIONIST: [
     { href: "/dashboard/receptionist", label: "Home", icon: Home },
     {
@@ -68,11 +75,17 @@ const navItemsByRole: Record<
       icon: BriefcaseMedical,
     },
     {
+      href: "/dashboard/receptionist/prescriptions",
+      label: "Prescriptions",
+      icon: NotebookPen,
+    },
+    {
       href: "/dashboard/receptionist/medical-records",
       label: "Medical Records",
       icon: Files,
     },
   ],
+
   DOCTOR: [
     { href: "/dashboard/doctor", label: "Home", icon: Home },
     {
@@ -85,6 +98,11 @@ const navItemsByRole: Record<
       href: "/dashboard/doctor/appointments",
       label: "Appointments",
       icon: BriefcaseMedical,
+    },
+    {
+      href: "/dashboard/doctor/prescriptions",
+      label: "Prescriptions",
+      icon: NotebookPen,
     },
     {
       href: "/dashboard/doctor/medical-records",
