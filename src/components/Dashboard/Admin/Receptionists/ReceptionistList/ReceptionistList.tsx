@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Eye, Plus, SearchIcon, Trash, User } from "lucide-react";
+import { Edit, Eye, SearchIcon, Trash, User } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -28,6 +28,7 @@ import {
   ReceptionistRecord,
 } from "@/types/Admin/Receptionists/ReceptionistsType";
 import { formatChoiceFieldValue } from "../../../../../../utils/formatters";
+import AddReceptionistDialog from "./Dialogs/AddReceptionistDialog";
 
 const ReceptionistList: React.FC = () => {
   const [query, setQuery] = useState("");
@@ -101,10 +102,7 @@ const ReceptionistList: React.FC = () => {
               className="w-full pl-10"
             />
           </div>
-          <Button size="sm" className="w-full sm:w-auto">
-            <Plus />
-            Add receptionist
-          </Button>
+          <AddReceptionistDialog />
         </div>
       </div>
 

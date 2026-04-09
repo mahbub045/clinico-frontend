@@ -28,3 +28,21 @@ export type ReceptionistApiItem = {
   created_at: string;
   updated_at: string;
 };
+
+export type AddReceptionistPayload = {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  title: string | null;
+  suburb: string;
+  postal_code: string;
+  address: string;
+  profile_image: File | null;
+  employee_id: string;
+  joining_date: string | null;
+  shift: string;
+  desk_number: string;
+  experience_years: string | null;
+};
