@@ -75,6 +75,31 @@ const normalizePatient = (
   };
 };
 
+const getPaginationRange = (currentPage: number, totalPages: number) => {
+  if (totalPages <= 9) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const range: Array<number | string> = [1];
+  const leftBound = Math.max(2, currentPage - 2);
+  const rightBound = Math.min(totalPages - 1, currentPage + 2);
+
+  if (leftBound > 2) {
+    range.push("left-ellipsis");
+  }
+
+  for (let page = leftBound; page <= rightBound; page += 1) {
+    range.push(page);
+  }
+
+  if (rightBound < totalPages - 1) {
+    range.push("right-ellipsis");
+  }
+
+  range.push(totalPages);
+  return range;
+};
+
 const PatientList: React.FC = () => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -106,8 +131,8 @@ const PatientList: React.FC = () => {
   const totalItems = patientsData?.total_items ?? normalizedPatients.length;
 
   const paginationPages = useMemo(
-    () => Array.from({ length: totalPages }, (_, index) => index + 1),
-    [totalPages],
+    () => getPaginationRange(currentPage, totalPages),
+    [currentPage, totalPages],
   );
 
   return (
@@ -269,48 +294,56 @@ const PatientList: React.FC = () => {
             Total Patients: {totalItems}.
           </p>
           {totalPages > 1 && (
-            <Pagination className="w-full sm:w-auto">
-              <PaginationPrevious
-                href="#"
-                className={
-                  currentPage <= 1
-                    ? "pointer-events-none opacity-50"
-                    : undefined
-                }
-                onClick={(event) => {
-                  event.preventDefault();
-                  if (currentPage > 1) setPage(currentPage - 1);
-                }}
-              />
-              <PaginationContent>
-                {paginationPages.map((pageNumber) => (
-                  <PaginationItem key={pageNumber}>
-                    <PaginationLink
-                      href="#"
-                      isActive={pageNumber === currentPage}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setPage(pageNumber);
-                      }}
-                    >
-                      {pageNumber}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-              </PaginationContent>
-              <PaginationNext
-                href="#"
-                className={
-                  currentPage >= totalPages
-                    ? "pointer-events-none opacity-50"
-                    : undefined
-                }
-                onClick={(event) => {
-                  event.preventDefault();
-                  if (currentPage < totalPages) setPage(currentPage + 1);
-                }}
-              />
-            </Pagination>
+            <div className="w-full overflow-x-auto sm:w-auto">
+              <Pagination className="inline-flex w-full items-center justify-between gap-2">
+                <PaginationPrevious
+                  href="#"
+                  className={
+                    currentPage <= 1
+                      ? "pointer-events-none opacity-50"
+                      : undefined
+                  }
+                  onClick={(event) => {
+                    event.preventDefault();
+                    if (currentPage > 1) setPage(currentPage - 1);
+                  }}
+                />
+                <PaginationContent className="flex flex-wrap items-center justify-center gap-2 py-1">
+                  {paginationPages.map((pageNumber, index) => (
+                    <PaginationItem key={`${pageNumber}-${index}`}>
+                      {typeof pageNumber === "number" ? (
+                        <PaginationLink
+                          href="#"
+                          isActive={pageNumber === currentPage}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            setPage(pageNumber);
+                          }}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      ) : (
+                        <span className="border-border/70 bg-muted text-muted-foreground inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-3 text-sm">
+                          …
+                        </span>
+                      )}
+                    </PaginationItem>
+                  ))}
+                </PaginationContent>
+                <PaginationNext
+                  href="#"
+                  className={
+                    currentPage >= totalPages
+                      ? "pointer-events-none opacity-50"
+                      : undefined
+                  }
+                  onClick={(event) => {
+                    event.preventDefault();
+                    if (currentPage < totalPages) setPage(currentPage + 1);
+                  }}
+                />
+              </Pagination>
+            </div>
           )}
         </div>
       </section>
