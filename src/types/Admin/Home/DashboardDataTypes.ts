@@ -17,3 +17,12 @@ export type ConditionAnalyticsPoint = {
   average_stay: number;
   average_satisfaction: number;
 };
+
+export type ProcedureAnalyticsPoint = {
+  procedure: string;
+  total_records: number;
+  total_cost: number;
+  average_cost: number;
+  average_stay: number;
+  average_satisfaction: number;
+};

@@ -9,8 +9,17 @@ export const MedicalRecordAnalyticsApi = BaseApi.injectEndpoints({
       }),
       providesTags: ["MedicalRecordSummary"],
     }),
+    getMedicalRecordAnalyticsProcedure: builder.query({
+      query: () => ({
+        url: "/api/core/medical-records/analytics/procedure/",
+        method: "GET",
+      }),
+      providesTags: ["MedicalRecordSummary"],
+    }),
   }),
 });
 
-export const { useGetMedicalRecordAnalyticsConditionQuery } =
-  MedicalRecordAnalyticsApi;
+export const {
+  useGetMedicalRecordAnalyticsConditionQuery,
+  useGetMedicalRecordAnalyticsProcedureQuery,
+} = MedicalRecordAnalyticsApi;
